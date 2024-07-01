@@ -2,6 +2,7 @@ import pyrealsense2 as rs
 import numpy as np
 import cv2
 import os
+import matplotlib.pyplot as plt
 
 # 创建保存图像和深度数据的目录
 output_dir = 'realsense_data'
@@ -43,12 +44,31 @@ try:
         depth_image = np.asanyarray(depth_frame.get_data())
         infrared_image = np.asanyarray(infrared_frame.get_data())
 
-        # 显示图像和深度数据
-        cv2.imshow('Color Image', color_image)
-        cv2.imshow('Aligned Depth Image', depth_image)
-        cv2.imshow('Infrared Image', infrared_image)
+        # 创建一个图像窗口展示三幅图像
+        plt.figure(figsize=(15, 5))
 
-        # 保存图像和深度数据
+        # 显示彩色图像
+        plt.subplot(1, 3, 1)
+        plt.imshow(cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB))
+        plt.title('Color Image')
+        plt.axis('off')
+
+        # 显示深度图像
+        plt.subplot(1, 3, 2)
+        plt.imshow(depth_image, cmap='gray')
+        plt.title('Depth Image')
+        plt.axis('off')
+
+        # 显示红外图像
+        plt.subplot(1, 3, 3)
+        plt.imshow(infrared_image, cmap='gray')
+        plt.title('Infrared Image')
+        plt.axis('off')
+
+        # 显示所有图像
+        plt.show()
+
+        # 保存图像
         cv2.imwrite(os.path.join(output_dir, 'color_image.png'), color_image)
         cv2.imwrite(os.path.join(output_dir, 'aligned_depth_image.png'), depth_image)
         cv2.imwrite(os.path.join(output_dir, 'infrared_image.png'), infrared_image)
