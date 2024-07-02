@@ -34,7 +34,7 @@ def start_recording():
     global rgb_writer, depth_writer, infrared_writer, recording_index
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     rgb_writer = cv2.VideoWriter(os.path.join(output_dir, f'rgb_video_{recording_index}.mp4'), cv2.VideoWriter_fourcc(*'mp4v'), 30.0, (1920, 1080))
-    depth_writer = cv2.VideoWriter(os.path.join(output_dir, f'depth_video_{recording_index}.mp4'), cv2.VideoWriter_fourcc(*'mp4v'), 30.0, (1280, 720), False)
+    depth_writer = cv2.VideoWriter(os.path.join(output_dir, f'depth_video_{recording_index}.mp4'), cv2.VideoWriter_fourcc(*'mp4v'), 30.0, (1920, 1080), False)
     infrared_writer = cv2.VideoWriter(os.path.join(output_dir, f'infrared_video_{recording_index}.mp4'), cv2.VideoWriter_fourcc(*'mp4v'), 30.0, (1280, 720), False)
 
 def stop_recording():
@@ -61,7 +61,11 @@ def update_plot(frame):
     color_image = np.asanyarray(color_frame.get_data())
     depth_image = np.asanyarray(depth_frame.get_data())
     infrared_image = np.asanyarray(infrared_frame.get_data())
-
+    # print(f"depth_image: {depth_image}")
+    # print(f"depth_image.shape: {depth_image.shape}")
+    # print(f"depth_image.type: {type(depth_image)}")
+    # print(f"infrared_image.shape: {infrared_image.shape}")
+    # print(f"infrared_image.type: {type(infrared_image)}")
     # 缩小显示分辨率
     display_image = cv2.resize(color_image, (640, 360))
 
