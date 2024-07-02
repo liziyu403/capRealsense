@@ -65,8 +65,8 @@ def update_plot(frame):
     # 缩小显示分辨率
     display_image = cv2.resize(color_image, (640, 360))
 
-    # 将深度图像转换为8位灰度图
-    depth_image_8bit = cv2.convertScaleAbs(depth_image, alpha=0.03)
+    # 将深度图像缩放到8位灰度图范围
+    depth_image_8bit = cv2.normalize(depth_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
 
     if show_depth:
         # 显示RGB和深度图像
