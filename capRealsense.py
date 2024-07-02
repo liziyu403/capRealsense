@@ -65,14 +65,14 @@ def update_plot(frame):
     # 缩小显示分辨率
     display_image = cv2.resize(color_image, (640, 360))
 
-    # 将深度图像缩放到8位灰度图范围
-    depth_image_8bit = cv2.normalize(depth_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+    # 将深度图像归一化到0-255范围，并转换为8位灰度图像
+    depth_image_normalized = (depth_image / 65536 * 255).astype(np.uint8)
 
     if show_depth:
         # 显示RGB和深度图像
         ax[0].imshow(cv2.cvtColor(display_image, cv2.COLOR_BGR2RGB))
         ax[0].axis('off')
-        ax[1].imshow(depth_image_8bit, cmap='gray')
+        ax[1].imshow(depth_image_normalized, cmap='gray')
         ax[1].axis('off')
     else:
         # 只显示RGB图像
@@ -82,8 +82,7 @@ def update_plot(frame):
     if is_recording:
         # 写入视频文件
         rgb_writer.write(color_image)
-        # print(depth_image_8bit)
-        depth_writer.write(depth_image_8bit)
+        depth_writer.write(depth_image_normalized)
         infrared_writer.write(infrared_image)
 
         # 在图像上显示红点和"REC"
@@ -102,7 +101,7 @@ def update_plot(frame):
         else:
             ax.add_patch(plt.Circle((50, 50), 20, color='white'))
             ax.text(80, 55, 'REC', color='white', fontsize=15, fontweight='bold')
-     	
+
 def on_key(event):
     global is_recording, show_depth
 
