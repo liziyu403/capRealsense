@@ -59,17 +59,20 @@ def update_plot(frame):
 
     # 将数据转换为numpy数组
     color_image = np.asanyarray(color_frame.get_data())
-    depth_image = (np.asanyarray(depth_frame.get_data())/6555) * 255
+    depth_image = np.asanyarray(depth_frame.get_data())
     infrared_image = np.asanyarray(infrared_frame.get_data())
 
     # 缩小显示分辨率
     display_image = cv2.resize(color_image, (640, 360))
 
+    # 将深度图像转换为8位灰度图
+    depth_image_8bit = cv2.convertScaleAbs(depth_image, alpha=0.03)
+
     if show_depth:
         # 显示RGB和深度图像
         ax[0].imshow(cv2.cvtColor(display_image, cv2.COLOR_BGR2RGB))
         ax[0].axis('off')
-        ax[1].imshow(depth_image, cmap='gray')
+        ax[1].imshow(depth_image_8bit, cmap='gray')
         ax[1].axis('off')
     else:
         # 只显示RGB图像
@@ -79,7 +82,7 @@ def update_plot(frame):
     if is_recording:
         # 写入视频文件
         rgb_writer.write(color_image)
-        depth_writer.write(depth_image)
+        depth_writer.write(depth_image_8bit)
         infrared_writer.write(infrared_image)
 
         # 在图像上显示红点和"REC"
