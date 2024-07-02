@@ -82,6 +82,7 @@ def update_plot(frame):
     if is_recording:
         # 写入视频文件
         rgb_writer.write(color_image)
+        # print(depth_image_8bit)
         depth_writer.write(depth_image_8bit)
         infrared_writer.write(infrared_image)
 
@@ -92,7 +93,16 @@ def update_plot(frame):
         else:
             ax.add_patch(plt.Circle((50, 50), 20, color='red'))
             ax.text(80, 55, 'REC', color='red', fontsize=15, fontweight='bold')
-
+  
+    else:
+        # 在图像上显示红点和"REC"
+        if show_depth:
+            ax[0].add_patch(plt.Circle((50, 50), 20, color='white'))
+            ax[0].text(80, 55, 'REC', color='white', fontsize=15, fontweight='bold')
+        else:
+            ax.add_patch(plt.Circle((50, 50), 20, color='white'))
+            ax.text(80, 55, 'REC', color='white', fontsize=15, fontweight='bold')
+     	
 def on_key(event):
     global is_recording, show_depth
 
