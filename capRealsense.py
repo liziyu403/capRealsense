@@ -18,14 +18,17 @@ config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
 config.enable_stream(rs.stream.infrared, 1, 1280, 720, rs.format.y8, 30)
 
 # 启动数据流
-pipeline.start(config)
+profile = pipeline.start(config)
 align_to = rs.stream.color
 align = rs.align(align_to)
+
+# 获取深度传感器
+depth_sensor = profile.get_device().first_depth_sensor()
 
 # 初始化录制状态
 is_recording = False
 recording_index = 1
-show_depth = False  # 控制是否展示深度图像
+show_depth = True  # 控制是否展示深度图像
 rgb_writer = None
 depth_writer = None
 infrared_writer = None
@@ -44,6 +47,18 @@ def stop_recording():
     infrared_writer.release()
     recording_index += 1
 
+def set_depth_camera_params(exposure=200, gain=16, laser_power=150):
+    """
+    设置深度相机参数
+
+    :param exposure: 曝光时间
+    :param gain: 增益
+    :param laser_power: 激光功率
+    """
+    depth_sensor.set_option(rs.option.exposure, exposure)  # 设置曝光时间
+    depth_sensor.set_option(rs.option.gain, gain)  # 设置增益
+    depth_sensor.set_option(rs.option.laser_power, laser_power)  # 设置激光功率
+
 def update_plot(frame):
     global is_recording
 
@@ -61,11 +76,7 @@ def update_plot(frame):
     color_image = np.asanyarray(color_frame.get_data())
     depth_image = np.asanyarray(depth_frame.get_data())
     infrared_image = np.asanyarray(infrared_frame.get_data())
-    # print(f"depth_image: {depth_image}")
-    # print(f"depth_image.shape: {depth_image.shape}")
-    # print(f"depth_image.type: {type(depth_image)}")
-    # print(f"infrared_image.shape: {infrared_image.shape}")
-    # print(f"infrared_image.type: {type(infrared_image)}")
+
     # 缩小显示分辨率
     display_image = cv2.resize(color_image, (640, 360))
 
@@ -80,7 +91,8 @@ def update_plot(frame):
         ax[1].axis('off')
     else:
         # 只显示RGB图像
-        ax.imshow(cv2.cvtColor(display_image, cv2.COLOR_BGR2RGB))
+        # ax.imshow(cv2.cvtColor(display_image, cv2.COLOR_BGR2RGB))
+        ax.imshow(depth_image_normalized, cmap='gray')
         ax.axis('off')
 
     if is_recording:
@@ -128,6 +140,9 @@ else:
     fig, ax = plt.subplots(1, 1, figsize=(8, 4.5))
 
 fig.canvas.mpl_connect('key_press_event', on_key)
+
+# 设置初始相机参数
+# set_depth_camera_params(exposure=500, gain=16, laser_power=250)
 
 # 开始实时更新
 ani = FuncAnimation(fig, update_plot, interval=1)
